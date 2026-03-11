@@ -12,20 +12,20 @@ describe("profile-completeness", () => {
 
   it("scores location (5 pts)", () => {
     const score = computeCompleteness({
-      location: { city: "Dubai", country: "UAE" },
+      location: { city: "Dubai", state: "", country: "UAE" },
     });
     expect(score).toBe(5);
   });
 
   it("does not score partial location", () => {
     const score = computeCompleteness({
-      location: { city: "Dubai" },
+      location: { city: "Dubai", state: "", country: "" },
     });
     expect(score).toBe(0);
   });
 
   it("scores specialty (10 pts)", () => {
-    expect(computeCompleteness({ specialty: "frontend" })).toBe(10);
+    expect(computeCompleteness({ specialty: "software_engineering" })).toBe(10);
   });
 
   it("scores experience level (10 pts)", () => {
@@ -67,14 +67,14 @@ describe("profile-completeness", () => {
 
   it("scores education (5 pts)", () => {
     expect(
-      computeCompleteness({ education: { level: "bachelors" } })
+      computeCompleteness({ education: { level: "bachelor" } })
     ).toBe(5);
   });
 
   it("caps at 100", () => {
     const full = computeCompleteness({
       name: "Test",
-      specialty: "fullstack",
+      specialty: "software_engineering",
       experienceLevel: "senior",
       yearsOfExperience: 10,
       skills: Array.from({ length: 15 }, (_, i) => `s${i}`),
@@ -82,8 +82,8 @@ describe("profile-completeness", () => {
       remotePreference: "remote",
       desiredLocations: ["US"],
       salaryMin: 100000,
-      education: { level: "masters" },
-      location: { city: "NYC", country: "US" },
+      education: { level: "master" },
+      location: { city: "NYC", state: "NY", country: "US" },
     });
     expect(full).toBeLessThanOrEqual(100);
   });
