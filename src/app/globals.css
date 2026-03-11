@@ -38,6 +38,8 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  --color-postit: var(--postit);
+  --color-blue: var(--blue);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -48,72 +50,112 @@
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.809 0.105 251.813);
-  --chart-2: oklch(0.623 0.214 259.815);
-  --chart-3: oklch(0.546 0.245 262.881);
-  --chart-4: oklch(0.488 0.243 264.376);
-  --chart-5: oklch(0.424 0.199 265.638);
+  /* Hand-drawn design system — warm paper, pencil, sketch aesthetic */
+  --background: #fdfbf7;
+  --foreground: #2d2d2d;
+  --card: #ffffff;
+  --card-foreground: #2d2d2d;
+  --popover: #ffffff;
+  --popover-foreground: #2d2d2d;
+  --primary: #2d2d2d;
+  --primary-foreground: #fdfbf7;
+  --secondary: #e5e0d8;
+  --secondary-foreground: #2d2d2d;
+  --muted: #e5e0d8;
+  --muted-foreground: #6b6560;
+  --accent: #ff4d4d;
+  --accent-foreground: #ffffff;
+  --destructive: #ff4d4d;
+  --border: #2d2d2d;
+  --input: #2d2d2d;
+  --ring: #2d5da1;
+  --blue: #2d5da1;
+  --postit: #fff9c4;
+  --chart-1: #ff4d4d;
+  --chart-2: #2d5da1;
+  --chart-3: #2d2d2d;
+  --chart-4: #e5e0d8;
+  --chart-5: #fff9c4;
   --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar: #fdfbf7;
+  --sidebar-foreground: #2d2d2d;
+  --sidebar-primary: #2d2d2d;
+  --sidebar-primary-foreground: #fdfbf7;
+  --sidebar-accent: #fff9c4;
+  --sidebar-accent-foreground: #2d2d2d;
+  --sidebar-border: #2d2d2d;
+  --sidebar-ring: #2d5da1;
+
+  /* Wobbly border-radius variants */
+  --radius-wobbly: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  --radius-wobbly-md: 15px 225px 15px 255px / 255px 15px 225px 15px;
+  --radius-wobbly-sm: 185px 10px 165px 10px / 10px 165px 10px 185px;
+
+  /* Hard offset shadows (NO blur) */
+  --shadow-sketch: 4px 4px 0px 0px #2d2d2d;
+  --shadow-sketch-lg: 8px 8px 0px 0px #2d2d2d;
+  --shadow-sketch-hover: 2px 2px 0px 0px #2d2d2d;
+  --shadow-sketch-subtle: 3px 3px 0px 0px rgba(45, 45, 45, 0.1);
 }
 
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.809 0.105 251.813);
-  --chart-2: oklch(0.623 0.214 259.815);
-  --chart-3: oklch(0.546 0.245 262.881);
-  --chart-4: oklch(0.488 0.243 264.376);
-  --chart-5: oklch(0.424 0.199 265.638);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+/* === GLOBAL STYLES === */
+
+body {
+  font-family: "Patrick Hand", cursive;
+  background-color: var(--background);
+  color: var(--foreground);
+  background-image: radial-gradient(#e5e0d8 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Kalam", cursive;
+  font-weight: 700;
+}
+
+/* Wobbly utility classes */
+.wobbly {
+  border-radius: var(--radius-wobbly);
+}
+
+.wobbly-md {
+  border-radius: var(--radius-wobbly-md);
+}
+
+.wobbly-sm {
+  border-radius: var(--radius-wobbly-sm);
+}
+
+.shadow-sketch {
+  box-shadow: var(--shadow-sketch);
+}
+
+.shadow-sketch-lg {
+  box-shadow: var(--shadow-sketch-lg);
+}
+
+.shadow-sketch-hover {
+  box-shadow: var(--shadow-sketch-hover);
+}
+
+.shadow-sketch-subtle {
+  box-shadow: var(--shadow-sketch-subtle);
+}
+
+/* Sketch button press effect */
+.sketch-btn {
+  box-shadow: var(--shadow-sketch);
+  transition: all 100ms ease;
+}
+
+.sketch-btn:hover {
+  box-shadow: var(--shadow-sketch-hover);
+  transform: translate(2px, 2px);
+}
+
+.sketch-btn:active {
+  box-shadow: none;
+  transform: translate(4px, 4px);
 }
 
 @layer base {
