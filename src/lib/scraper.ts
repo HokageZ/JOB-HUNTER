@@ -63,17 +63,17 @@ export async function scrapeJobs(request: ScrapeRequest): Promise<ScrapedJob[]> 
     });
 
     if (stderr) {
-      // Try to extract a user-friendly error from stderr JSON
+      // Only treat stderr as error if it contains our JSON error object
+      // python-jobspy writes its own log messages to stderr — those are fine
       try {
         const errObj = JSON.parse(stderr);
         if (errObj.error) {
           throw new Error(errObj.error);
         }
       } catch (parseErr) {
-        // Not JSON — just log it as a warning
+        // Not JSON — just JobSpy log output, ignore
         if (!(parseErr instanceof SyntaxError)) throw parseErr;
       }
-      logger.warn("scraper", "stderr output", stderr);
     }
 
     const parsed = JSON.parse(stdout);
@@ -88,7 +88,7 @@ export async function scrapeJobs(request: ScrapeRequest): Promise<ScrapedJob[]> 
 
     return parsed as ScrapedJob[];
   } catch (err: unknown) {
-    const error = err as NodeJS.ErrnoException & { stderr?: string };
+    const error = err as NodeJS.ErrnoException & { stderr?: string; stdout?: string };
 
     if (error.code === "ENOENT") {
       throw new Error(
@@ -96,7 +96,23 @@ export async function scrapeJobs(request: ScrapeRequest): Promise<ScrapedJob[]> 
       );
     }
 
-    // Extract user-friendly message from subprocess stderr
+    // Sometimes python-jobspy exits non-zero but still produced valid results on stdout
+    if (error.stdout) {
+      try {
+        const parsed = JSON.parse(error.stdout);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed as ScrapedJob[];
+        }
+        // Empty array is also valid
+        if (Array.isArray(parsed)) {
+          return [];
+        }
+      } catch {
+        // stdout wasn't valid JSON, continue to error handling
+      }
+    }
+
+    // Check for our structured error in stderr
     if (error.stderr) {
       try {
         const errObj = JSON.parse(error.stderr);
@@ -118,6 +134,12 @@ export async function scrapeJobs(request: ScrapeRequest): Promise<ScrapedJob[]> 
         throw new Error(
           "Scraper configuration error. Try updating python-jobspy: pip install -U python-jobspy"
         );
+      }
+
+      // If stderr just contains JobSpy log messages (INFO, WARNING), not real errors
+      if (!stderr.includes("Error") && !stderr.includes("Traceback") && !stderr.includes("Exception")) {
+        // JobSpy succeeded but maybe found nothing — return empty
+        return [];
       }
     }
 

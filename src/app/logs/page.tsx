@@ -37,12 +37,12 @@ const LEVEL_COLORS: Record<string, string> = {
 
 const TEXT_COLORS: Record<string, string> = {
   debug: "text-[#9ca3af]",
-  info: "text-[#e5e7eb]",
-  warn: "text-[#fbbf24]",
-  error: "text-[#f87171]",
+  info: "text-[#2d2d2d]",
+  warn: "text-[#856404]",
+  error: "text-[#b91c1c]",
 };
 
-const DATA_COLOR = "text-[#6b7280]";
+const DATA_COLOR = "text-[#6b6560]";
 
 export default function LogsPage() {
   const [entries, setEntries] = useState<LogEntry[]>([]);
@@ -306,16 +306,16 @@ export default function LogsPage() {
         <ScrollArea ref={scrollRef} className="h-full">
           <div className="p-3 font-mono text-sm space-y-0.5">
             {entries.length === 0 ? (
-              <p className="text-[#6b7280] text-center py-12">
+              <p className="text-[#b5b0a8] text-center py-12">
                 No log entries yet. Backend operations will appear here.
               </p>
             ) : (
               entries.map((entry, i) => (
                 <div
                   key={`${entry.timestamp}-${i}`}
-                  className="flex items-start gap-2 py-0.5 hover:bg-[#2a2a2a] px-1 rounded"
+                  className="flex items-start gap-2 py-0.5 hover:bg-[#f5f1eb] px-1 rounded"
                 >
-                  <span className="text-[#6b7280] shrink-0 text-xs mt-0.5">
+                  <span className="text-[#b5b0a8] shrink-0 text-xs mt-0.5">
                     {formatDate(entry.timestamp)} {formatTime(entry.timestamp)}
                   </span>
                   <Badge
@@ -324,7 +324,7 @@ export default function LogsPage() {
                   >
                     {entry.level}
                   </Badge>
-                  <span className="text-[#61afef] shrink-0 text-xs mt-0.5">
+                  <span className="text-[#2d5da1] shrink-0 text-xs mt-0.5">
                     [{entry.module}]
                   </span>
                   <span className={`${TEXT_COLORS[entry.level]} text-xs break-all`}>

@@ -7,7 +7,12 @@ Uses CLI arguments, outputs JSON results on stdout.
 
 import argparse
 import json
+import logging
 import sys
+
+# Suppress python-jobspy's internal logging to prevent stderr pollution
+logging.getLogger("jobspy").setLevel(logging.CRITICAL)
+logging.getLogger().setLevel(logging.CRITICAL)
 
 try:
     from jobspy import scrape_jobs
@@ -68,6 +73,10 @@ def main():
             job_type=args.job_type,
             verbose=0,
         )
+
+        if jobs is None or jobs.empty:
+            print(json.dumps([]))
+            return
 
         # Convert DataFrame to list of dicts
         results = jobs.to_dict(orient="records")

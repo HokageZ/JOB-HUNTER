@@ -129,7 +129,11 @@ export async function POST(
           queries.push({ term: q.term, loc, countryIndeed: countryCode });
         }
 
-        // If user wants remote, also run a remote-only query (no location)
+        // Always run a broad no-location query to find jobs anywhere
+        // (dedup will prevent duplicates from location-specific queries)
+        queries.push({ term: q.term, loc: "", countryIndeed: countryCode });
+
+        // If user wants remote, also flag the broad query as remote
         if (profile.remotePreference === "remote" || profile.remotePreference === "any") {
           queries.push({ term: q.term, loc: "", isRemote: true, countryIndeed: countryCode });
         }
