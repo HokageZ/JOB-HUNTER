@@ -8,7 +8,19 @@ Uses CLI arguments, outputs JSON results on stdout.
 import argparse
 import json
 import sys
-from jobspy import scrape_jobs
+
+try:
+    from jobspy import scrape_jobs
+except ImportError:
+    print(
+        json.dumps(
+            {
+                "error": "python-jobspy is not installed. Run: pip install python-jobspy"
+            }
+        ),
+        file=sys.stderr,
+    )
+    sys.exit(1)
 
 
 def main():
@@ -52,7 +64,7 @@ def main():
             results_wanted=args.results,
             hours_old=args.hours_old,
             country_indeed=args.country,
-            is_remote=True if args.remote else None,
+            is_remote=args.remote,
             job_type=args.job_type,
             verbose=0,
         )
@@ -69,7 +81,24 @@ def main():
         print(json.dumps(results, default=str))
 
     except Exception as e:
-        print(json.dumps({"error": str(e)}), file=sys.stderr)
+        error_msg = str(e)
+
+        # Translate common errors to user-friendly messages
+        if "validation error" in error_msg.lower():
+            error_msg = (
+                f"Scraper configuration error: {error_msg}. "
+                "Try updating python-jobspy: pip install -U python-jobspy"
+            )
+        elif "no results" in error_msg.lower() or "empty" in error_msg.lower():
+            error_msg = "No jobs found matching your search criteria. Try different keywords or broaden your search."
+        elif "timeout" in error_msg.lower() or "timed out" in error_msg.lower():
+            error_msg = "The job board took too long to respond. Try again in a few minutes."
+        elif "403" in error_msg or "blocked" in error_msg.lower():
+            error_msg = "The job board is temporarily blocking requests. Try again later or use a different source."
+        elif "connection" in error_msg.lower() or "network" in error_msg.lower():
+            error_msg = "Network error — couldn't reach the job board. Check your internet connection."
+
+        print(json.dumps({"error": error_msg}), file=sys.stderr)
         sys.exit(1)
 
 

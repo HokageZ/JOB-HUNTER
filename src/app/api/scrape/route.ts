@@ -174,7 +174,15 @@ export async function POST(
     });
   } catch (err) {
     console.error("[/api/scrape] Error:", err);
-    const message = err instanceof Error ? err.message : "Scrape failed";
+    let message = err instanceof Error ? err.message : "Scrape failed";
+
+    // Ensure no raw command output leaks to the user
+    if (message.includes("Command failed:")) {
+      message = "The job scraper encountered an error. Make sure Python and python-jobspy are installed.";
+    } else if (message.includes("ETIMEDOUT") || message.includes("timed out")) {
+      message = "The scraper timed out. Try reducing the number of results or sites.";
+    }
+
     return NextResponse.json(
       { success: false, error: message },
       { status: 500 }
