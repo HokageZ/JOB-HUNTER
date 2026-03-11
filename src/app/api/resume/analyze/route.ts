@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getDb } from "@/lib/db";
 import { chatJSON } from "@/lib/openrouter";
+import { logger } from "@/lib/logger";
 import type { ApiResponse, ResumeRow, UserProfile } from "@/types";
 
 const analyzeSchema = z.object({
@@ -196,7 +197,7 @@ Do NOT fabricate experience or skills not present in the resume.`;
       data: { parsedData, aiReview, atsScore },
     });
   } catch (error) {
-    console.error("[resume analyze]", error);
+    logger.error("api:resume-analyze", "Error", error);
     return NextResponse.json(
       {
         success: false,

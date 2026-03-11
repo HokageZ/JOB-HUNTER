@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
+import { logger } from "@/lib/logger";
 import type { ApiResponse } from "@/types";
 
 interface JobWithScore {
@@ -134,7 +135,7 @@ export async function GET(
       data: { jobs, total, page, totalPages },
     });
   } catch (err) {
-    console.error("[/api/jobs] Error:", err);
+    logger.error("api:jobs", "Error", err);
     return NextResponse.json(
       { success: false, error: "Failed to fetch jobs" },
       { status: 500 }

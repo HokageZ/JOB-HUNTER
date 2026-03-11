@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
+import { logger } from "@/lib/logger";
 import type { ApiResponse, ResumeRow } from "@/types";
 
 export async function GET(): Promise<NextResponse<ApiResponse<ResumeRow[]>>> {
@@ -13,7 +14,7 @@ export async function GET(): Promise<NextResponse<ApiResponse<ResumeRow[]>>> {
 
     return NextResponse.json({ success: true, data: resumes });
   } catch (error) {
-    console.error("[resume GET]", error);
+    logger.error("api:resume", "GET error", error);
     return NextResponse.json(
       { success: false, error: "Failed to fetch resumes" },
       { status: 500 }

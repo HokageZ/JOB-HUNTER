@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { chatJSON, chatWithRetry } from "@/lib/openrouter";
+import { logger } from "@/lib/logger";
 import type { JobRow, ApplicationRow } from "@/types";
 
 interface InterviewPrepPackage {
@@ -254,7 +255,7 @@ Tailor difficulty to ${level} level. Be specific to the role and tech stack.`;
       },
     });
   } catch (error) {
-    console.error("[ai/interview-prep] Error:", error);
+    logger.error("api:interview-prep", "Error", error);
     const msg =
       error instanceof Error
         ? error.message
@@ -331,7 +332,7 @@ export async function PATCH(request: NextRequest) {
       data: { message: "Updated" },
     });
   } catch (error) {
-    console.error("[ai/interview-prep] PATCH Error:", error);
+    logger.error("api:interview-prep", "PATCH error", error);
     return NextResponse.json(
       { success: false, error: "Failed to update interview prep" },
       { status: 500 }

@@ -6,6 +6,7 @@ import { generateSearchQueries } from "@/lib/query-generator";
 import { shouldScrape, updateScrapeCache } from "@/lib/scrape-cache";
 import { insertScrapedJobs } from "@/lib/job-storage";
 import { calculateMatchScore } from "@/lib/matching";
+import { logger } from "@/lib/logger";
 import type { UserProfile, JobRow, ApiResponse } from "@/types";
 
 const scrapeRequestSchema = z.object({
@@ -101,6 +102,8 @@ export async function POST(
         continue;
       }
 
+      logger.info("api:scrape", `Scraping "${query.term}" in "${query.loc || 'any location'}"`);
+
       try {
         const results = await scrapeJobs({
           searchTerm: query.term,
@@ -124,7 +127,7 @@ export async function POST(
         queriesFailed++;
         const msg = queryErr instanceof Error ? queryErr.message : String(queryErr);
         errors.push(`"${query.term}": ${msg}`);
-        console.warn(`[/api/scrape] Query "${query.term}" failed:`, msg);
+        logger.warn("api:scrape", `Query "${query.term}" failed: ${msg}`);
       }
     }
 
@@ -170,7 +173,7 @@ export async function POST(
 
         scoreAll();
       } catch (err) {
-        console.warn("[/api/scrape] Auto-scoring failed:", err);
+        logger.warn("api:scrape", "Auto-scoring failed", err);
       }
     }
 
@@ -199,7 +202,7 @@ export async function POST(
       },
     });
   } catch (err) {
-    console.error("[/api/scrape] Error:", err);
+    logger.error("api:scrape", "Scrape error", err);
     let message = err instanceof Error ? err.message : "Scrape failed";
 
     // Ensure no raw command output leaks to the user

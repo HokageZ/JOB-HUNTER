@@ -3,6 +3,8 @@ interface ChatMessage {
   content: string;
 }
 
+import { logger } from "@/lib/logger";
+
 interface ChatOptions {
   model?: string;
   temperature?: number;
@@ -66,7 +68,7 @@ export async function chatWithRetry(
 
       return await chat(messages, { ...options, model });
     } catch (error) {
-      console.error(`[openrouter] Attempt ${attempt + 1} failed:`, error);
+      logger.error("openrouter", `Attempt ${attempt + 1} failed`, error);
       if (attempt === retries - 1) throw error;
       await new Promise((r) => setTimeout(r, Math.pow(2, attempt) * 1000));
     }

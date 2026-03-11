@@ -1,6 +1,7 @@
 import { execFile } from "child_process";
 import { promisify } from "util";
 import path from "path";
+import { logger } from "@/lib/logger";
 
 const execFileAsync = promisify(execFile);
 
@@ -72,7 +73,7 @@ export async function scrapeJobs(request: ScrapeRequest): Promise<ScrapedJob[]> 
         // Not JSON — just log it as a warning
         if (!(parseErr instanceof SyntaxError)) throw parseErr;
       }
-      console.warn("[scraper] stderr:", stderr);
+      logger.warn("scraper", "stderr output", stderr);
     }
 
     const parsed = JSON.parse(stdout);

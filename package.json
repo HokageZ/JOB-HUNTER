@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:debug": "set LOG_LEVEL=debug&& next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",

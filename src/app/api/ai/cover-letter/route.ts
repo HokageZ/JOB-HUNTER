@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { chatWithRetry } from "@/lib/openrouter";
+import { logger } from "@/lib/logger";
 import type { JobRow } from "@/types";
 
 export async function POST(request: NextRequest) {
@@ -111,7 +112,7 @@ Write the cover letter:`;
       data: { coverLetter },
     });
   } catch (error) {
-    console.error("[ai/cover-letter] Error:", error);
+    logger.error("api:cover-letter", "Error", error);
     const msg =
       error instanceof Error ? error.message : "Failed to generate cover letter";
     return NextResponse.json({ success: false, error: msg }, { status: 500 });

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getDb } from "@/lib/db";
+import { logger } from "@/lib/logger";
 import type { ApiResponse, ReminderRow } from "@/types";
 
 const updateReminderSchema = z.object({
@@ -55,7 +56,7 @@ export async function PATCH(
 
     return NextResponse.json({ success: true, data: updated });
   } catch (error) {
-    console.error("[reminders PATCH]", error);
+    logger.error("api:reminders", "PATCH error", error);
     return NextResponse.json(
       { success: false, error: "Failed to update reminder" },
       { status: 500 }

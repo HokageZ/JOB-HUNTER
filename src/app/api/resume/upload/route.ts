@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { parseResume } from "@/lib/resume-parser";
+import { logger } from "@/lib/logger";
 import type { ApiResponse, ResumeRow } from "@/types";
 import path from "path";
 import fs from "fs";
@@ -111,7 +112,7 @@ export async function POST(
 
     return NextResponse.json(response, { status: 201 });
   } catch (error) {
-    console.error("[resume upload]", error);
+    logger.error("api:resume-upload", "Upload error", error);
     return NextResponse.json(
       { success: false, error: "Failed to upload resume" },
       { status: 500 }

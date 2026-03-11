@@ -3,6 +3,7 @@ import { z } from "zod";
 import { getDb } from "@/lib/db";
 import { calculateMatchScore } from "@/lib/matching";
 import { generateMatchReasons } from "@/lib/match-reasoning";
+import { logger } from "@/lib/logger";
 import type { UserProfile, JobRow, ApiResponse, MatchResult } from "@/types";
 
 const matchRequestSchema = z.object({
@@ -140,7 +141,7 @@ export async function POST(
         updateAll();
       }
     } catch {
-      console.warn("[/api/match] AI reasoning skipped (API unavailable)");
+      logger.warn("api:match", "AI reasoning skipped (API unavailable)");
     }
 
     return NextResponse.json({
@@ -148,7 +149,7 @@ export async function POST(
       data: { scored: jobs.length, recommended },
     });
   } catch (err) {
-    console.error("[/api/match] Error:", err);
+    logger.error("api:match", "Error", err);
     const message = err instanceof Error ? err.message : "Match scoring failed";
     return NextResponse.json(
       { success: false, error: message },

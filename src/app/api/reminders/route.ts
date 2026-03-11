@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getDb } from "@/lib/db";
+import { logger } from "@/lib/logger";
 import type { ApiResponse, ReminderRow } from "@/types";
 
 export interface ReminderWithContext extends ReminderRow {
@@ -34,7 +35,7 @@ export async function GET(): Promise<
 
     return NextResponse.json({ success: true, data: rows });
   } catch (error) {
-    console.error("[reminders GET]", error);
+    logger.error("api:reminders", "GET error", error);
     return NextResponse.json(
       { success: false, error: "Failed to fetch reminders" },
       { status: 500 }
@@ -88,7 +89,7 @@ export async function POST(
 
     return NextResponse.json({ success: true, data: created }, { status: 201 });
   } catch (error) {
-    console.error("[reminders POST]", error);
+    logger.error("api:reminders", "POST error", error);
     return NextResponse.json(
       { success: false, error: "Failed to create reminder" },
       { status: 500 }

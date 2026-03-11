@@ -19,6 +19,7 @@ import {
   MessageCircle,
   Settings,
   Menu,
+  ScrollText,
 } from "lucide-react";
 
 const NAV_ITEMS = [
@@ -28,6 +29,7 @@ const NAV_ITEMS = [
   { href: "/tracker", label: "Tracker", icon: KanbanSquare },
   { href: "/resume", label: "Resume", icon: FileText },
   { href: "/chat", label: "Chat", icon: MessageCircle },
+  { href: "/logs", label: "Logs", icon: ScrollText },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 

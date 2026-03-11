@@ -4,6 +4,7 @@ import { generateSearchQueries } from "@/lib/query-generator";
 import { shouldScrape, updateScrapeCache } from "@/lib/scrape-cache";
 import { insertScrapedJobs } from "@/lib/job-storage";
 import { calculateMatchScore } from "@/lib/matching";
+import { logger } from "@/lib/logger";
 import type { UserProfile, JobRow } from "@/types";
 
 let schedulerRunning = false;
@@ -39,13 +40,11 @@ export function startScheduler(intervalMs?: number) {
     try {
       await scheduledScrape();
     } catch (error) {
-      console.error("[scheduler] Error:", error);
+      logger.error("scheduler", "Scheduled scrape error", error);
     }
   }, interval);
 
-  console.log(
-    `[scheduler] Started. Will scrape every ${Math.round(interval / 3_600_000)} hours.`
-  );
+  logger.info("scheduler", `Started. Will scrape every ${Math.round(interval / 3_600_000)} hours.`);
 }
 
 export function stopScheduler() {
@@ -54,7 +53,7 @@ export function stopScheduler() {
     intervalId = null;
   }
   schedulerRunning = false;
-  console.log("[scheduler] Stopped.");
+  logger.info("scheduler", "Stopped.");
 }
 
 export async function scheduledScrape(): Promise<{
@@ -62,7 +61,7 @@ export async function scheduledScrape(): Promise<{
   duplicatesSkipped: number;
   queriesRun: number;
 }> {
-  console.log("[scheduler] Running scheduled scrape...");
+  logger.info("scheduler", "Running scheduled scrape...");
 
   const db = getDb();
   const profileRow = db
@@ -70,7 +69,7 @@ export async function scheduledScrape(): Promise<{
     .get() as { data: string } | undefined;
 
   if (!profileRow) {
-    console.log("[scheduler] No profile found. Skipping.");
+    logger.warn("scheduler", "No profile found. Skipping.");
     return { newJobs: 0, duplicatesSkipped: 0, queriesRun: 0 };
   }
 
@@ -113,7 +112,7 @@ export async function scheduledScrape(): Promise<{
 
       updateScrapeCache(q.term, loc, sites, results.length);
     } catch (error) {
-      console.error(`[scheduler] Scrape failed for "${q.term}":`, error);
+      logger.error("scheduler", `Scrape failed for "${q.term}"`, error);
     }
   }
 
@@ -159,13 +158,11 @@ export async function scheduledScrape(): Promise<{
 
       scoreAll();
     } catch (error) {
-      console.error("[scheduler] Scoring failed:", error);
+      logger.error("scheduler", "Auto-scoring failed", error);
     }
   }
 
-  console.log(
-    `[scheduler] Done. ${totalNew} new jobs, ${totalDuplicates} duplicates, ${queriesRun} queries.`
-  );
+  logger.info("scheduler", `Done. ${totalNew} new jobs, ${totalDuplicates} duplicates, ${queriesRun} queries.`);
 
   return {
     newJobs: totalNew,

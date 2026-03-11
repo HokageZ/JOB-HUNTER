@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { chatWithRetry } from "@/lib/openrouter";
+import { logger } from "@/lib/logger";
 import type { ApplicationRow } from "@/types";
 
 export async function POST(request: NextRequest) {
@@ -81,7 +82,7 @@ Rules:
       data: { email },
     });
   } catch (error) {
-    console.error("[ai/thank-you] Error:", error);
+    logger.error("api:thank-you", "Error", error);
     const msg =
       error instanceof Error
         ? error.message

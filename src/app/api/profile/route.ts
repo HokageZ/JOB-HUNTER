@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { profileSchema } from "@/lib/schemas/profile";
 import { computeCompleteness } from "@/lib/profile-completeness";
+import { logger } from "@/lib/logger";
 import fs from "fs";
 import path from "path";
 
@@ -18,7 +19,7 @@ export async function GET() {
 
     return NextResponse.json({ success: true, data: JSON.parse(row.data) });
   } catch (error) {
-    console.error("[profile] GET error:", error);
+    logger.error("api:profile", "GET error", error);
     return NextResponse.json(
       { success: false, error: "Failed to load profile" },
       { status: 500 }
@@ -72,7 +73,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ success: true, data: profile });
   } catch (error) {
-    console.error("[profile] POST error:", error);
+    logger.error("api:profile", "POST error", error);
     return NextResponse.json(
       { success: false, error: "Failed to save profile" },
       { status: 500 }

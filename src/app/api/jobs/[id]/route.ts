@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
+import { logger } from "@/lib/logger";
 import type { ApiResponse, JobRow, MatchScoreRow, ApplicationRow } from "@/types";
 
 interface JobDetail {
@@ -48,7 +49,7 @@ export async function GET(
       data: { job, matchScore, application },
     });
   } catch (err) {
-    console.error("[/api/jobs/[id]] Error:", err);
+    logger.error("api:jobs", "Detail error", err);
     return NextResponse.json(
       { success: false, error: "Failed to fetch job" },
       { status: 500 }

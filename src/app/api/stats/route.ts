@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
+import { logger } from "@/lib/logger";
 
 export async function GET() {
   try {
@@ -163,7 +164,7 @@ export async function GET() {
       },
     });
   } catch (error) {
-    console.error("[stats] GET Error:", error);
+    logger.error("api:stats", "GET error", error);
     return NextResponse.json(
       { success: false, error: "Failed to load stats" },
       { status: 500 }

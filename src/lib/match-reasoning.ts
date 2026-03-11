@@ -1,4 +1,5 @@
 import { chatWithRetry, type ChatMessage } from "@/lib/openrouter";
+import { logger } from "@/lib/logger";
 import type { UserProfile, JobRow, MatchResult } from "@/types";
 
 interface ScoredJob {
@@ -94,7 +95,7 @@ export async function generateMatchReasons(
       }
     } catch (err) {
       // Graceful degradation — deterministic scores still work
-      console.warn("[match-reasoning] Failed to generate batch reasons:", err);
+      logger.warn("match-reasoning", "Failed to generate batch reasons", err);
     }
   }
 

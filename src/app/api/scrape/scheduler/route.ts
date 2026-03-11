@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { logger } from "@/lib/logger";
 import {
   isSchedulerRunning,
   getLastScrapeTime,
@@ -17,7 +18,7 @@ export async function GET() {
       },
     });
   } catch (error) {
-    console.error("[scheduler] GET error:", error);
+    logger.error("api:scheduler", "GET error", error);
     return NextResponse.json(
       { success: false, error: "Failed to get scheduler status" },
       { status: 500 }
@@ -50,7 +51,7 @@ export async function POST(request: Request) {
       { status: 400 }
     );
   } catch (error) {
-    console.error("[scheduler] POST error:", error);
+    logger.error("api:scheduler", "POST error", error);
     return NextResponse.json(
       {
         success: false,

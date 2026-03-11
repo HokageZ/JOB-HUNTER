@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getDb } from "@/lib/db";
+import { logger } from "@/lib/logger";
 import type { ApiResponse } from "@/types";
 
 const dismissSchema = z.object({
@@ -38,7 +39,7 @@ export async function POST(
       data: { dismissed: true },
     });
   } catch (err) {
-    console.error("[/api/jobs/dismiss] Error:", err);
+    logger.error("api:jobs-dismiss", "Error", err);
     return NextResponse.json(
       { success: false, error: "Failed to dismiss job" },
       { status: 500 }

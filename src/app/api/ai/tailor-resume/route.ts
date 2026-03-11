@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { chatJSON } from "@/lib/openrouter";
+import { logger } from "@/lib/logger";
 import type { JobRow } from "@/types";
 
 interface TailoringResult {
@@ -128,7 +129,7 @@ Return JSON (no markdown wrapping):
       data: suggestions,
     });
   } catch (error) {
-    console.error("[ai/tailor-resume] Error:", error);
+    logger.error("api:tailor-resume", "Error", error);
     const msg =
       error instanceof Error
         ? error.message

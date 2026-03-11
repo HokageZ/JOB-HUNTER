@@ -1,6 +1,7 @@
 import Database from "better-sqlite3";
 import path from "path";
 import fs from "fs";
+import { logger } from "@/lib/logger";
 
 const DATA_DIR = path.join(process.cwd(), "data");
 if (!fs.existsSync(DATA_DIR)) {
@@ -50,7 +51,7 @@ function runMigrations(database: Database.Database): void {
       const sql = fs.readFileSync(path.join(migrationsDir, file), "utf-8");
       database.exec(sql);
       database.prepare("INSERT INTO _migrations (name) VALUES (?)").run(file);
-      console.log(`[db] Migration applied: ${file}`);
+      logger.info("db", `Migration applied: ${file}`);
     }
   }
 }

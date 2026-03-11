@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getDb } from "@/lib/db";
+import { logger } from "@/lib/logger";
 import { VALID_TRANSITIONS } from "@/types";
 import type { ApiResponse, ApplicationRow, JobRow } from "@/types";
 
@@ -154,7 +155,7 @@ export async function PATCH(
 
     return NextResponse.json({ success: true, data: updated });
   } catch (error) {
-    console.error("[applications PATCH]", error);
+    logger.error("api:applications", "PATCH error", error);
     return NextResponse.json(
       { success: false, error: "Failed to update application" },
       { status: 500 }
@@ -194,7 +195,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true, data: { deleted: true } });
   } catch (error) {
-    console.error("[applications DELETE]", error);
+    logger.error("api:applications", "DELETE error", error);
     return NextResponse.json(
       { success: false, error: "Failed to delete application" },
       { status: 500 }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { chatWithRetry } from "@/lib/openrouter";
 import type { ChatMessage } from "@/lib/openrouter";
+import { logger } from "@/lib/logger";
 import {
   buildToolInstructions,
   parseToolCall,
@@ -173,7 +174,7 @@ Keep responses focused and practical — avoid generic filler.`;
     insert.run("assistant", cleanFinal);
     return NextResponse.json({ success: true, data: { response: cleanFinal } });
   } catch (error) {
-    console.error("[ai/chat] Error:", error);
+    logger.error("api:chat", "Chat error", error);
     const msg =
       error instanceof Error ? error.message : "Failed to get AI response";
     return NextResponse.json({ success: false, error: msg }, { status: 500 });
@@ -189,7 +190,7 @@ export async function GET() {
 
     return NextResponse.json({ success: true, data: messages });
   } catch (error) {
-    console.error("[ai/chat] GET Error:", error);
+    logger.error("api:chat", "GET error", error);
     return NextResponse.json(
       { success: false, error: "Failed to load chat history" },
       { status: 500 }
@@ -203,7 +204,7 @@ export async function DELETE() {
     db.prepare("DELETE FROM chat_history").run();
     return NextResponse.json({ success: true, data: { message: "Chat history cleared" } });
   } catch (error) {
-    console.error("[ai/chat] DELETE Error:", error);
+    logger.error("api:chat", "DELETE error", error);
     return NextResponse.json(
       { success: false, error: "Failed to clear chat history" },
       { status: 500 }

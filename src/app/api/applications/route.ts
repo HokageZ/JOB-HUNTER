@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getDb } from "@/lib/db";
+import { logger } from "@/lib/logger";
 import type { ApiResponse, ApplicationRow, JobRow } from "@/types";
 
 export interface ApplicationWithJob extends ApplicationRow {
@@ -48,7 +49,7 @@ export async function GET(
 
     return NextResponse.json({ success: true, data: rows });
   } catch (error) {
-    console.error("[applications GET]", error);
+    logger.error("api:applications", "GET error", error);
     return NextResponse.json(
       { success: false, error: "Failed to fetch applications" },
       { status: 500 }
@@ -141,7 +142,7 @@ export async function POST(
 
     return NextResponse.json({ success: true, data: created }, { status: 201 });
   } catch (error) {
-    console.error("[applications POST]", error);
+    logger.error("api:applications", "POST error", error);
     return NextResponse.json(
       { success: false, error: "Failed to create application" },
       { status: 500 }
