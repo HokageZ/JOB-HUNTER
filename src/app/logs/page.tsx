@@ -36,11 +36,13 @@ const LEVEL_COLORS: Record<string, string> = {
 };
 
 const TEXT_COLORS: Record<string, string> = {
-  debug: "text-gray-500",
-  info: "text-[#2d2d2d]",
-  warn: "text-[#856404]",
-  error: "text-[#721c24]",
+  debug: "text-[#9ca3af]",
+  info: "text-[#e5e7eb]",
+  warn: "text-[#fbbf24]",
+  error: "text-[#f87171]",
 };
+
+const DATA_COLOR = "text-[#6b7280]";
 
 export default function LogsPage() {
   const [entries, setEntries] = useState<LogEntry[]>([]);
@@ -303,7 +305,7 @@ export default function LogsPage() {
         <ScrollArea ref={scrollRef} className="h-full">
           <div className="p-3 font-mono text-sm space-y-0.5">
             {entries.length === 0 ? (
-              <p className="text-gray-500 text-center py-12">
+              <p className="text-[#6b7280] text-center py-12">
                 No log entries yet. Backend operations will appear here.
               </p>
             ) : (
@@ -312,7 +314,7 @@ export default function LogsPage() {
                   key={`${entry.timestamp}-${i}`}
                   className="flex items-start gap-2 py-0.5 hover:bg-[#2a2a2a] px-1 rounded"
                 >
-                  <span className="text-gray-500 shrink-0 text-xs mt-0.5">
+                  <span className="text-[#6b7280] shrink-0 text-xs mt-0.5">
                     {formatDate(entry.timestamp)} {formatTime(entry.timestamp)}
                   </span>
                   <Badge
@@ -327,7 +329,7 @@ export default function LogsPage() {
                   <span className={`${TEXT_COLORS[entry.level]} text-xs break-all`}>
                     {entry.message}
                     {entry.data !== undefined && (
-                      <span className="text-gray-500 ml-1">
+                      <span className={`${DATA_COLOR} ml-1`}>
                         {typeof entry.data === "string"
                           ? entry.data
                           : JSON.stringify(entry.data)}

@@ -9,15 +9,39 @@ import { calculateMatchScore } from "@/lib/matching";
 import { logger } from "@/lib/logger";
 import type { UserProfile, JobRow, ApiResponse } from "@/types";
 
+const ALL_JOBSPY_SITES = ["indeed", "linkedin", "glassdoor", "google", "zip_recruiter"];
+
 const scrapeRequestSchema = z.object({
   searchTerm: z.string().min(1).optional(),
   location: z.string().optional(),
-  sites: z.array(z.string()).optional().default(["google"]),
-  resultsWanted: z.number().optional().default(25),
+  sites: z.array(z.string()).optional().default(ALL_JOBSPY_SITES),
+  resultsWanted: z.number().optional().default(15),
   hoursOld: z.number().optional().default(72),
   isRemote: z.boolean().optional(),
   jobType: z.string().optional(),
 });
+
+// Map common country names to Indeed country codes
+const COUNTRY_TO_INDEED: Record<string, string> = {
+  USA: "USA", "United States": "USA", US: "USA",
+  UK: "UK", "United Kingdom": "UK",
+  Canada: "Canada", Australia: "Australia",
+  India: "India", Germany: "Germany", France: "France",
+  Netherlands: "Netherlands", Singapore: "Singapore",
+  UAE: "UAE", Japan: "Japan", Brazil: "Brazil",
+  Mexico: "Mexico", Spain: "Spain", Italy: "Italy",
+  Ireland: "Ireland", Sweden: "Sweden", Norway: "Norway",
+  Switzerland: "Switzerland", Poland: "Poland",
+  "South Korea": "South Korea", "New Zealand": "New Zealand",
+  Philippines: "Philippines", Malaysia: "Malaysia",
+  "South Africa": "South Africa", Nigeria: "Nigeria",
+  Egypt: "Egypt", "Saudi Arabia": "Saudi Arabia",
+  Qatar: "Qatar", Bahrain: "Bahrain", Kuwait: "Kuwait",
+  Oman: "Oman", Jordan: "Jordan", Iraq: "Iraq",
+  Lebanon: "Lebanon", Morocco: "Morocco", Tunisia: "Tunisia",
+  Turkey: "Turkey", Pakistan: "Pakistan", Bangladesh: "Bangladesh",
+  Kenya: "Kenya", Ghana: "Ghana",
+};
 
 interface ScrapeResult {
   newJobs: number;
@@ -60,6 +84,8 @@ export async function POST(
     interface QueryItem {
       term: string;
       loc: string;
+      isRemote?: boolean;
+      countryIndeed?: string;
     }
     const queries: QueryItem[] = [];
 
@@ -67,14 +93,46 @@ export async function POST(
       queries.push({ term: searchTerm, loc: location ?? "" });
     } else if (profile) {
       const generated = generateSearchQueries(profile);
+
+      // Build location list from profile
+      const locations: string[] = [];
+
+      // Add desired locations
+      if (profile.desiredLocations?.length) {
+        locations.push(...profile.desiredLocations);
+      }
+
+      // Add home city if not already included
+      if (profile.location?.city) {
+        const homeCity = profile.location.state
+          ? `${profile.location.city}, ${profile.location.state}`
+          : `${profile.location.city}, ${profile.location.country || ""}`;
+        if (!locations.some((l) => l.toLowerCase().includes(profile.location.city!.toLowerCase()))) {
+          locations.push(homeCity);
+        }
+      }
+
+      // Fallback: if no locations at all, use country
+      if (locations.length === 0 && profile.location?.country) {
+        locations.push(profile.location.country);
+      }
+
+      // Determine Indeed country code
+      const countryCode = profile.location?.country
+        ? COUNTRY_TO_INDEED[profile.location.country] ?? "USA"
+        : "USA";
+
+      // Generate query × location combinations
       for (const q of generated) {
-        const loc =
-          location ??
-          (profile.desiredLocations?.[0] ||
-            (profile.location?.city
-              ? `${profile.location.city}, ${profile.location.state}`
-              : ""));
-        queries.push({ term: q.term, loc });
+        // Run each query in each location
+        for (const loc of locations) {
+          queries.push({ term: q.term, loc, countryIndeed: countryCode });
+        }
+
+        // If user wants remote, also run a remote-only query (no location)
+        if (profile.remotePreference === "remote" || profile.remotePreference === "any") {
+          queries.push({ term: q.term, loc: "", isRemote: true, countryIndeed: countryCode });
+        }
       }
     } else {
       return NextResponse.json(
@@ -102,7 +160,7 @@ export async function POST(
         continue;
       }
 
-      logger.info("api:scrape", `Scraping "${query.term}" in "${query.loc || 'any location'}"`);
+      logger.info("api:scrape", `Scraping "${query.term}" in "${query.loc || 'remote/any'}" via ${sites.join(",")}`);
 
       try {
         const results = await scrapeJobs({
@@ -111,8 +169,9 @@ export async function POST(
           sites,
           resultsWanted,
           hoursOld,
-          isRemote,
+          isRemote: query.isRemote || isRemote,
           jobType,
+          countryIndeed: query.countryIndeed,
         });
 
         const { newJobs, duplicatesSkipped, insertedIds } = insertScrapedJobs(results);
