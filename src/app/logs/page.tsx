@@ -49,7 +49,7 @@ export default function LogsPage() {
   const [modules, setModules] = useState<string[]>([]);
   const [levelFilter, setLevelFilter] = useState<string>("all");
   const [moduleFilter, setModuleFilter] = useState<string>("all");
-  const [streaming, setStreaming] = useState(false);
+  const [streaming, setStreaming] = useState(true);
   const [autoScroll, setAutoScroll] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
   const eventSourceRef = useRef<EventSource | null>(null);
@@ -134,11 +134,12 @@ export default function LogsPage() {
     setStreaming(false);
   }, []);
 
-  // Initial load
+  // Initial load — start streaming by default
   useEffect(() => {
-    fetchLogs();
     fetchModules();
-  }, [fetchLogs, fetchModules]);
+    startStream();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fetchModules]);
 
   // Re-fetch when filters change (non-streaming mode)
   useEffect(() => {
@@ -299,7 +300,7 @@ export default function LogsPage() {
 
       {/* Log viewer */}
       <div
-        className="flex-1 border-[3px] border-[#2d2d2d] bg-[#1e1e1e] shadow-[4px_4px_0px_0px_#2d2d2d] overflow-hidden"
+        className="flex-1 border-[3px] border-[#2d2d2d] bg-transparent shadow-[4px_4px_0px_0px_#2d2d2d] overflow-hidden"
         style={{ borderRadius: "var(--radius-wobbly)" }}
       >
         <ScrollArea ref={scrollRef} className="h-full">

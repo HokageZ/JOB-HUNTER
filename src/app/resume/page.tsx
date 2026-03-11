@@ -595,7 +595,7 @@ export default function ResumePage() {
                 takes 30–60 seconds.
               </p>
               <div className="mt-4 flex justify-center">
-                <Progress value={undefined} className="h-2 w-48" />
+                <Progress value={null} className="h-2 w-48" />
               </div>
             </div>
           ) : !review ? (
