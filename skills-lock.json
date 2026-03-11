@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "skills": {
+    "SQLite Database Expert": {
+      "source": "martinholovsky/claude-skills-generator",
+      "sourceType": "github",
+      "computedHash": "515e1971f145631025485c6dbf83c62bb7ee0fabc805d0e2bd07ac2aac7f24d8"
+    },
+    "ai-engineer-expert": {
+      "source": "personamanagmentlayer/pcl",
+      "sourceType": "github",
+      "computedHash": "1671e987679d9547a21b7fd5e5a2d9ac22ca2056432d15134f715b57a9e18613"
+    },
+    "create-agent": {
+      "source": "openrouterteam/agent-skills",
+      "sourceType": "github",
+      "computedHash": "ced8d4f944d0b5afb803720fc4665590eda57c30adfb3ecb493726ba6c66b79c"
+    },
+    "document-parsers": {
+      "source": "vanman2024/ai-dev-marketplace",
+      "sourceType": "github",
+      "computedHash": "64a91737a5fbb6004f5d0da14c8d4a74d92c4a60c50e911b519fabef981ba41d"
+    },
+    "implementing-drag-drop": {
+      "source": "ancoleman/ai-design-components",
+      "sourceType": "github",
+      "computedHash": "861ba06673879b5f79dd95c3d3643be20f4e9608ed86140d9ab8f74492eed507"
+    },
+    "nextjs-app-router-fundamentals": {
+      "source": "wsimmonds/claude-nextjs-skills",
+      "sourceType": "github",
+      "computedHash": "7db69d3b4cdc7e880b667b7173146f3ff8b8fb096aace7f2e7f47ec4bac3ee79"
+    },
+    "nextjs-app-router-patterns": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "computedHash": "04c1df896cc2c9ef824d618b95d21686c5b8e24e5cb32b3d6fe9d97d4b661536"
+    },
+    "openrouter-typescript-sdk": {
+      "source": "openrouterteam/agent-skills",
+      "sourceType": "github",
+      "computedHash": "d6effb9c0f5f5361ed95976936845fd3c9e8eeef53f9214aa2e82845c708fd3f"
+    },
+    "shadcn-ui": {
+      "source": "bobmatnyc/claude-mpm-skills",
+      "sourceType": "github",
+      "computedHash": "84e0a2707a4cc03661cf5eaf0b793daa0692d2eb5a6159de0a824bf6b2ad801c"
+    },
+    "shadcn-ui-expert": {
+      "source": "majesteitbart/talentmatcher",
+      "sourceType": "github",
+      "computedHash": "36c0c60befed47a8fb01384278f03cd1248092857d835dfafd606c18dbab11e9"
+    },
+    "tailwindcss": {
+      "source": "blencorp/claude-code-kit",
+      "sourceType": "github",
+      "computedHash": "b1341efcc0dbeaa4c59ab4396f6a4688ad8bdf4073a35ed9e2b3b451041c8ae5"
+    },
+    "zod": {
+      "source": "secondsky/claude-skills",
+      "sourceType": "github",
+      "computedHash": "e4e27177512c9d68b68d4a6cb6ad26ab126e6750efce4e581f5cf31f0321a968"
+    }
+  }
+}
