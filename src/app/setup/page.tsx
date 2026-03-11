@@ -242,6 +242,24 @@ export default function SetupPage() {
           <span>{Math.round(stepProgress)}%</span>
         </div>
         <Progress value={stepProgress} className="h-3 border-2 border-[#2d2d2d]" />
+        <div className="flex justify-between mt-2">
+          {["Basics", "Experience", "Skills", "Preferences", "Review"].map(
+            (name, i) => (
+              <span
+                key={name}
+                className={`text-xs ${
+                  i + 1 === step
+                    ? "font-bold text-[#2d2d2d]"
+                    : i + 1 < step
+                      ? "text-[#2d5da1]"
+                      : "text-[#d1cdc7]"
+                }`}
+              >
+                {name}
+              </span>
+            )
+          )}
+        </div>
       </div>
 
       <div
@@ -804,6 +822,9 @@ function PreferencesStep({ profile, update, errors }: StepProps) {
           </Select>
         </div>
       </div>
+      <p className="text-xs text-[#b5b0a8] -mt-2">
+        Optional — helps filter and match jobs by salary range
+      </p>
     </div>
   );
 }

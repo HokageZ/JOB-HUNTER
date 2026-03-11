@@ -7,7 +7,7 @@ import { JobCard, type JobCardData } from "@/components/job-card";
 import { JobFilters, type FilterState } from "@/components/job-filters";
 import { JobDetailSheet } from "@/components/job-detail-sheet";
 import { toast } from "sonner";
-import { RefreshCw } from "lucide-react";
+import { RefreshCw, Search, SlidersHorizontal } from "lucide-react";
 
 const DEFAULT_FILTERS: FilterState = {
   search: "",
@@ -142,6 +142,14 @@ export default function JobsPage() {
     (j) => j.is_recommended === 1
   ).length;
 
+  const activeFilterCount = [
+    filters.search,
+    filters.source !== "all" ? filters.source : "",
+    filters.isRemote !== "all" ? filters.isRemote : "",
+    filters.jobType !== "all" ? filters.jobType : "",
+    filters.showDismissed ? "dismissed" : "",
+  ].filter(Boolean).length;
+
   return (
     <div>
       {/* Header */}
@@ -183,6 +191,11 @@ export default function JobsPage() {
             recommended
           </span>
         )}
+        {activeFilterCount > 0 && (
+          <span className="flex items-center gap-1 text-sm">
+            · <SlidersHorizontal size={12} /> {activeFilterCount} filter{activeFilterCount > 1 ? "s" : ""} active
+          </span>
+        )}
       </div>
 
       {/* Job list */}
@@ -204,16 +217,28 @@ export default function JobsPage() {
             boxShadow: "var(--shadow-sketch-subtle)",
           }}
         >
+          <Search className="w-12 h-12 text-[#d1cdc7] mx-auto mb-3" />
           <p
             className="text-2xl font-bold text-[#2d2d2d] mb-2"
             style={{ fontFamily: "'Kalam', cursive" }}
           >
-            No jobs yet
+            {activeFilterCount > 0 ? "No jobs match your filters" : "No jobs yet"}
           </p>
           <p className="text-lg text-[#6b6560] mb-4">
-            Click &quot;Search for Jobs&quot; to find matching positions from
-            Google Jobs based on your profile.
+            {activeFilterCount > 0
+              ? "Try changing or clearing your filters to see more results."
+              : "Click \"Search for Jobs\" to find matching positions from Google Jobs based on your profile."}
           </p>
+          {activeFilterCount > 0 && (
+            <Button
+              variant="outline"
+              onClick={() => handleFilterChange(DEFAULT_FILTERS)}
+              className="border-2 border-[#2d2d2d] sketch-btn"
+              style={{ borderRadius: "var(--radius-wobbly-sm)" }}
+            >
+              Clear All Filters
+            </Button>
+          )}
         </div>
       ) : (
         <div className="grid gap-4">

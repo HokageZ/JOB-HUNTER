@@ -81,12 +81,45 @@ export async function chatJSON<T>(
   options: ChatOptions = {}
 ): Promise<T> {
   const response = await chatWithRetry(messages, options);
-  const jsonMatch = response.match(/```(?:json)?\s*([\s\S]*?)```/) || [
-    null,
-    response,
-  ];
-  const jsonStr = jsonMatch[1]?.trim() || response.trim();
-  return JSON.parse(jsonStr) as T;
+
+  // Try code-fenced JSON first
+  const fenceMatch = response.match(/```(?:json)?\s*([\s\S]*?)```/);
+  if (fenceMatch?.[1]) {
+    try {
+      return JSON.parse(fenceMatch[1].trim()) as T;
+    } catch {
+      // fence content wasn't valid JSON, try other methods
+    }
+  }
+
+  // Try finding JSON object/array in the response
+  const objectMatch = response.match(/(\{[\s\S]*\})/);
+  if (objectMatch?.[1]) {
+    try {
+      return JSON.parse(objectMatch[1]) as T;
+    } catch {
+      // not valid JSON object
+    }
+  }
+
+  const arrayMatch = response.match(/(\[[\s\S]*\])/);
+  if (arrayMatch?.[1]) {
+    try {
+      return JSON.parse(arrayMatch[1]) as T;
+    } catch {
+      // not valid JSON array
+    }
+  }
+
+  // Last resort: try the raw response
+  try {
+    return JSON.parse(response.trim()) as T;
+  } catch {
+    logger.error("openrouter", "Failed to parse JSON from AI response", {
+      responsePreview: response.slice(0, 500),
+    });
+    throw new Error("AI returned an invalid response. Please try again.");
+  }
 }
 
 export type { ChatMessage, ChatOptions };

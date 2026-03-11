@@ -107,10 +107,16 @@ RESUME TEXT:
 ${resume.raw_text}
 ---`;
 
-    const parsedData = await chatJSON(
-      [{ role: "user", content: extractionPrompt }],
-      { maxTokens: 3000 }
-    );
+    // Step 1: Structure extraction — best-effort
+    let parsedData: unknown = null;
+    try {
+      parsedData = await chatJSON(
+        [{ role: "user", content: extractionPrompt }],
+        { maxTokens: 3000 }
+      );
+    } catch (extractErr) {
+      logger.warn("api:resume-analyze", "Structure extraction failed, proceeding with analysis only", extractErr);
+    }
 
     // Step 2: Comprehensive analysis
     const analysisPrompt = `You are an expert career advisor and resume reviewer. Analyze the following resume against the target profile and provide detailed, actionable feedback.
@@ -122,10 +128,7 @@ ${profile ? `TARGET PROFILE:
 - Target skills: ${profile.skills.join(", ")}
 - Location preference: ${profile.remotePreference}, ${profile.desiredLocations.join(", ")}` : "No target profile available — provide general resume feedback."}
 
-PARSED RESUME:
-${JSON.stringify(parsedData, null, 2)}
-
-RAW RESUME TEXT:
+${parsedData ? `PARSED RESUME:\n${JSON.stringify(parsedData, null, 2)}\n\n` : ""}RAW RESUME TEXT:
 ${resume.raw_text}
 
 Provide your analysis as a JSON object with the following structure:

@@ -21,6 +21,14 @@ export async function POST(
   request: Request
 ): Promise<NextResponse<ApiResponse<ResumeRow>>> {
   try {
+    const contentType = request.headers.get("content-type") || "";
+
+    // Handle text paste (JSON body)
+    if (contentType.includes("application/json")) {
+      return handleTextPaste(request);
+    }
+
+    // Handle file upload (FormData)
     const formData = await request.formData();
     const file = formData.get("file") as File | null;
 
@@ -118,4 +126,61 @@ export async function POST(
       { status: 500 }
     );
   }
+}
+
+async function handleTextPaste(
+  request: Request
+): Promise<NextResponse<ApiResponse<ResumeRow>>> {
+  const body = await request.json();
+  const { text, title } = body;
+
+  if (!text || typeof text !== "string" || text.trim().length < 20) {
+    return NextResponse.json(
+      { success: false, error: "Resume text must be at least 20 characters" },
+      { status: 400 }
+    );
+  }
+
+  const rawText = text.trim();
+  const fileName = (typeof title === "string" && title.trim())
+    ? title.trim()
+    : `Pasted Resume — ${new Date().toLocaleDateString()}`;
+  const wordCount = rawText.split(/\s+/).length;
+
+  const db = getDb();
+  const result = db
+    .prepare(
+      `INSERT INTO resumes (file_name, file_path, file_type, file_size, raw_text)
+       VALUES (?, ?, ?, ?, ?)`
+    )
+    .run(fileName, "", "txt", Buffer.byteLength(rawText, "utf-8"), rawText);
+
+  const resumeId = Number(result.lastInsertRowid);
+
+  const count = db
+    .prepare("SELECT count(*) as c FROM resumes")
+    .get() as { c: number };
+  if (count.c === 1) {
+    db.prepare("UPDATE resumes SET is_default = 1 WHERE id = ?").run(resumeId);
+  }
+
+  const created = db
+    .prepare("SELECT * FROM resumes WHERE id = ?")
+    .get(resumeId) as ResumeRow;
+
+  logger.info("api:resume-upload", `Text resume pasted: "${fileName}" (${wordCount} words)`);
+
+  return NextResponse.json(
+    {
+      success: true,
+      data: {
+        ...created,
+        wordCount,
+        ...(wordCount < 50
+          ? { warning: "This doesn't look like a full resume. Paste your complete resume for a thorough review." }
+          : {}),
+      },
+    } as ApiResponse<ResumeRow & { wordCount: number; warning?: string }>,
+    { status: 201 }
+  );
 }

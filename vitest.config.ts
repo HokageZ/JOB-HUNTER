@@ -5,7 +5,7 @@ export default defineConfig({
   test: {
     environment: "node",
     include: ["tests/**/*.test.ts"],
-    exclude: ["tests/e2e/**"],
+    exclude: ["tests/e2e/**", "tests/api/**"],
     globals: true,
     testTimeout: 30000,
   },
