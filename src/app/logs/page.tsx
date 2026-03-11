@@ -304,7 +304,7 @@ export default function LogsPage() {
         style={{ borderRadius: "var(--radius-wobbly)" }}
       >
         <ScrollArea ref={scrollRef} className="h-full">
-          <div className="p-3 font-mono text-sm space-y-0.5">
+          <div className="p-4 font-mono text-sm space-y-1">
             {entries.length === 0 ? (
               <p className="text-[#b5b0a8] text-center py-12">
                 No log entries yet. Backend operations will appear here.
@@ -313,21 +313,21 @@ export default function LogsPage() {
               entries.map((entry, i) => (
                 <div
                   key={`${entry.timestamp}-${i}`}
-                  className="flex items-start gap-2 py-0.5 hover:bg-[#f5f1eb] px-1 rounded"
+                  className="flex items-start gap-3 py-1.5 hover:bg-[#f5f1eb] px-2 rounded"
                 >
-                  <span className="text-[#b5b0a8] shrink-0 text-xs mt-0.5">
+                  <span className="text-[#b5b0a8] shrink-0 text-sm">
                     {formatDate(entry.timestamp)} {formatTime(entry.timestamp)}
                   </span>
                   <Badge
                     variant="outline"
-                    className={`shrink-0 text-[10px] px-1.5 py-0 uppercase font-bold border ${LEVEL_COLORS[entry.level]}`}
+                    className={`shrink-0 text-xs px-2 py-0.5 uppercase font-bold border ${LEVEL_COLORS[entry.level]}`}
                   >
                     {entry.level}
                   </Badge>
-                  <span className="text-[#2d5da1] shrink-0 text-xs mt-0.5">
+                  <span className="text-[#2d5da1] shrink-0 text-sm font-semibold">
                     [{entry.module}]
                   </span>
-                  <span className={`${TEXT_COLORS[entry.level]} text-xs break-all`}>
+                  <span className={`${TEXT_COLORS[entry.level]} text-sm break-all`}>
                     {entry.message}
                     {entry.data !== undefined && (
                       <span className={`${DATA_COLOR} ml-1`}>

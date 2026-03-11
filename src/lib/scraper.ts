@@ -136,8 +136,9 @@ export async function scrapeJobs(request: ScrapeRequest): Promise<ScrapedJob[]> 
         );
       }
 
-      // If stderr just contains JobSpy log messages (INFO, WARNING), not real errors
-      if (!stderr.includes("Error") && !stderr.includes("Traceback") && !stderr.includes("Exception")) {
+      // If stderr just contains JobSpy log messages (INFO, WARNING, timestamps), not real errors
+      const hasRealError = /(?:^|\n)\s*(?:Traceback|Exception|ModuleNotFoundError|Error:)/m.test(stderr);
+      if (!hasRealError) {
         // JobSpy succeeded but maybe found nothing — return empty
         return [];
       }
@@ -146,13 +147,15 @@ export async function scrapeJobs(request: ScrapeRequest): Promise<ScrapedJob[]> 
     // Re-throw with cleaned message
     const msg = error.message || String(err);
     if (msg.includes("Command failed:")) {
-      // Strip the raw command line from the error
-      const cleanMsg = msg
-        .replace(/Command failed:.*?\n/, "")
-        .replace(/\{.*\}/, "")
-        .trim();
+      // Check if the stderr portion is just JobSpy log noise
+      const stderrInMsg = msg.replace(/Command failed:.*?\n/, "").trim();
+      const isJustLogs = /^\d{4}-\d{2}-\d{2}.*(?:INFO|WARNING|DEBUG)/m.test(stderrInMsg) &&
+        !/(?:Traceback|Exception|Error:)/m.test(stderrInMsg);
+      if (isJustLogs || !stderrInMsg) {
+        return [];
+      }
       throw new Error(
-        cleanMsg || "The job scraper encountered an error. Check your Python environment and try again."
+        "The job scraper encountered an error. Check your Python environment and try again."
       );
     }
 

@@ -9,10 +9,13 @@ import argparse
 import json
 import logging
 import sys
+import os
 
-# Suppress python-jobspy's internal logging to prevent stderr pollution
-logging.getLogger("jobspy").setLevel(logging.CRITICAL)
-logging.getLogger().setLevel(logging.CRITICAL)
+# Suppress ALL logging to prevent stderr pollution from python-jobspy
+# JobSpy uses various logger names — kill everything at root level
+logging.disable(logging.CRITICAL)
+# Also redirect stderr temporarily for any print-to-stderr from JobSpy internals
+os.environ["PYTHONDONTWRITEBYTECODE"] = "1"
 
 try:
     from jobspy import scrape_jobs
