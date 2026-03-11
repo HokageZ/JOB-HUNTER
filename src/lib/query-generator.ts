@@ -59,10 +59,10 @@ export function generateSearchQueries(profile: UserProfile): SearchQuery[] {
     }
   }
 
-  // Deduplicate and sort by priority, then cap at 10
+  // Deduplicate and sort by priority, then cap at 5
   return deduplicateQueries(queries)
     .sort((a, b) => a.priority - b.priority)
-    .slice(0, 10);
+    .slice(0, 5);
 }
 
 export function buildIndeedQuery(profile: UserProfile): string {

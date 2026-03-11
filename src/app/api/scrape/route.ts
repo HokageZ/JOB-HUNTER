@@ -11,8 +11,8 @@ import type { UserProfile, JobRow, ApiResponse } from "@/types";
 const scrapeRequestSchema = z.object({
   searchTerm: z.string().min(1).optional(),
   location: z.string().optional(),
-  sites: z.array(z.string()).optional().default(["indeed"]),
-  resultsWanted: z.number().optional().default(50),
+  sites: z.array(z.string()).optional().default(["google"]),
+  resultsWanted: z.number().optional().default(25),
   hoursOld: z.number().optional().default(72),
   isRemote: z.boolean().optional(),
   jobType: z.string().optional(),
@@ -23,6 +23,8 @@ interface ScrapeResult {
   duplicatesSkipped: number;
   queriesRun: number;
   queriesSkipped: number;
+  queriesFailed?: number;
+  warnings?: string[];
 }
 
 export async function POST(
@@ -88,7 +90,9 @@ export async function POST(
     let totalDuplicates = 0;
     let queriesRun = 0;
     let queriesSkipped = 0;
+    let queriesFailed = 0;
     const allInsertedIds: number[] = [];
+    const errors: string[] = [];
 
     for (const query of queries) {
       // Check cache
@@ -97,24 +101,31 @@ export async function POST(
         continue;
       }
 
-      const results = await scrapeJobs({
-        searchTerm: query.term,
-        location: query.loc || undefined,
-        sites,
-        resultsWanted,
-        hoursOld,
-        isRemote,
-        jobType,
-      });
+      try {
+        const results = await scrapeJobs({
+          searchTerm: query.term,
+          location: query.loc || undefined,
+          sites,
+          resultsWanted,
+          hoursOld,
+          isRemote,
+          jobType,
+        });
 
-      const { newJobs, duplicatesSkipped, insertedIds } = insertScrapedJobs(results);
-      totalNew += newJobs;
-      totalDuplicates += duplicatesSkipped;
-      allInsertedIds.push(...insertedIds);
-      queriesRun++;
+        const { newJobs, duplicatesSkipped, insertedIds } = insertScrapedJobs(results);
+        totalNew += newJobs;
+        totalDuplicates += duplicatesSkipped;
+        allInsertedIds.push(...insertedIds);
+        queriesRun++;
 
-      // Update cache
-      updateScrapeCache(query.term, query.loc, sites, results.length);
+        // Update cache
+        updateScrapeCache(query.term, query.loc, sites, results.length);
+      } catch (queryErr) {
+        queriesFailed++;
+        const msg = queryErr instanceof Error ? queryErr.message : String(queryErr);
+        errors.push(`"${query.term}": ${msg}`);
+        console.warn(`[/api/scrape] Query "${query.term}" failed:`, msg);
+      }
     }
 
     // Auto-score new jobs if profile exists
@@ -163,6 +174,19 @@ export async function POST(
       }
     }
 
+    // If ALL queries failed and we got nothing, return error
+    if (queriesRun === 0 && queriesFailed > 0) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: errors.length === 1
+            ? errors[0]
+            : `All ${queriesFailed} searches failed. The job boards may be temporarily unavailable. Try again in a few minutes.`,
+        },
+        { status: 502 }
+      );
+    }
+
     return NextResponse.json({
       success: true,
       data: {
@@ -170,6 +194,8 @@ export async function POST(
         duplicatesSkipped: totalDuplicates,
         queriesRun,
         queriesSkipped,
+        queriesFailed,
+        ...(errors.length > 0 && { warnings: errors }),
       },
     });
   } catch (err) {

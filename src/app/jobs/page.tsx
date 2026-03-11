@@ -76,15 +76,23 @@ export default function JobsPage() {
       });
       const data = await res.json();
       if (data.success) {
-        toast.success(
-          `Found ${data.data.newJobs} new jobs (${data.data.duplicatesSkipped} duplicates skipped)`
-        );
+        const { newJobs, duplicatesSkipped, queriesFailed, warnings } = data.data;
+        if (newJobs > 0) {
+          toast.success(`Found ${newJobs} new jobs! (${duplicatesSkipped} duplicates skipped)`);
+        } else if (duplicatesSkipped > 0) {
+          toast.info(`No new jobs found (${duplicatesSkipped} duplicates skipped). Try again later for fresh results.`);
+        } else {
+          toast.info("No jobs found this time. Try adjusting your profile or search criteria.");
+        }
+        if (queriesFailed > 0 && warnings?.length) {
+          toast.warning(`${queriesFailed} search(es) failed — some job boards may be temporarily unavailable.`);
+        }
         fetchJobs();
       } else {
         toast.error(data.error || "Scrape failed");
       }
     } catch {
-      toast.error("Scrape request failed");
+      toast.error("Couldn't reach the scraper. Check your connection and try again.");
     } finally {
       setScraping(false);
     }
@@ -203,8 +211,8 @@ export default function JobsPage() {
             No jobs yet
           </p>
           <p className="text-lg text-[#6b6560] mb-4">
-            Click &quot;Search for Jobs&quot; to start scraping job boards based
-            on your profile.
+            Click &quot;Search for Jobs&quot; to find matching positions from
+            Google Jobs based on your profile.
           </p>
         </div>
       ) : (

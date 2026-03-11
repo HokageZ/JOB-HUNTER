@@ -57,7 +57,7 @@ export async function scrapeJobs(request: ScrapeRequest): Promise<ScrapedJob[]> 
 
   try {
     const { stdout, stderr } = await execFileAsync("python", args, {
-      timeout: 120_000,
+      timeout: 60_000,
       maxBuffer: 10 * 1024 * 1024,
     });
 
